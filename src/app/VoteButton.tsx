@@ -10,7 +10,7 @@ function Button() {
     <button
       type="submit"
       disabled={pending}
-      className="shrink-0 rounded-full bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-300/50 transition hover:scale-105 hover:bg-indigo-700 active:scale-95 disabled:cursor-not-allowed disabled:scale-100 disabled:opacity-60"
+      className="shrink-0 rounded-full bg-gradient-to-r from-hot-pink to-ember px-4 py-2 text-sm font-bold text-white shadow-lg shadow-hot-pink/30 transition-transform duration-150 hover:scale-110 hover:shadow-hot-pink/50 active:scale-90 disabled:cursor-not-allowed disabled:scale-100 disabled:opacity-60"
     >
       {pending ? "투표 중..." : "투표하기"}
     </button>
