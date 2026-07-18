@@ -1,0 +1,14 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
+import { SITES } from "@/lib/sites";
+
+export async function castVote(siteId: string) {
+  if (!SITES.some((s) => s.id === siteId)) {
+    return;
+  }
+
+  await prisma.vote.create({ data: { site: siteId } });
+  revalidatePath("/");
+}
