@@ -6,7 +6,7 @@ export type Site = {
 
 export const SITES: Site[] = [
   { id: "callting", name: "callting", url: "https://callting.vercel.app" },
-  { id: "site2", name: "팀원2 사이트 (링크 준비중)", url: "https://example.com" },
-  { id: "site3", name: "팀원3 사이트 (링크 준비중)", url: "https://example.com" },
-  { id: "site4", name: "팀원4 사이트 (링크 준비중)", url: "https://example.com" },
+  { id: "bbokbbok", name: "bbokbbok", url: "https://bbokbbok.vercel.app/" },
+  { id: "odijjm", name: "odijjm", url: "https://odijjm.madcamp-kaist.org/" },
+  { id: "omys", name: "omys", url: "https://omys.madcamp-kaist.org/" },
 ];
