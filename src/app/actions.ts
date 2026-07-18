@@ -12,3 +12,14 @@ export async function castVote(siteId: string) {
   await prisma.vote.create({ data: { site: siteId } });
   revalidatePath("/");
 }
+
+export async function postComment(formData: FormData) {
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (!body || body.length > 200) {
+    return;
+  }
+
+  await prisma.comment.create({ data: { body } });
+  revalidatePath("/");
+}

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { buildResults } from "@/lib/voteCounts";
 import VoteButton from "./VoteButton";
 import AnimatedCount from "./AnimatedCount";
+import CommentForm from "./CommentForm";
 
 const RANK_BADGE = ["👑", "🥈", "🥉", "💀"];
 
@@ -48,6 +49,11 @@ export default async function Home() {
   const leaderCount = ranked[0]?.count ?? 0;
   const maxCount = Math.max(1, leaderCount);
   const totalVotes = results.reduce((sum, r) => sum + r.count, 0);
+
+  const comments = await prisma.comment.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
 
   return (
     <div className="relative mx-auto flex min-h-screen max-w-lg flex-col gap-7 overflow-hidden px-6 py-16">
@@ -156,6 +162,44 @@ export default async function Home() {
           );
         })}
       </ul>
+
+      <section className="relative flex flex-col gap-3">
+        <h2 className="font-display text-xl text-foreground">
+          익명 피드백 💬
+        </h2>
+        <p className="-mt-2 text-xs text-lilac">
+          등록한 피드백은 수정하거나 지울 수 없어요. 신중하게 남겨주세요.
+        </p>
+
+        <CommentForm />
+
+        {comments.length === 0 ? (
+          <p className="text-sm text-lilac/70">
+            아직 피드백이 없어요. 첫 댓글의 주인공이 되어보세요.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {comments.map((comment) => (
+              <li
+                key={comment.id}
+                className="rounded-xl border border-lilac/20 bg-ink-2 px-4 py-3"
+              >
+                <p className="text-sm break-words whitespace-pre-wrap text-foreground">
+                  {comment.body}
+                </p>
+                <p className="mt-1 font-mono text-[11px] text-lilac/60">
+                  {comment.createdAt.toLocaleString("ko-KR", {
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

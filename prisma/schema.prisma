@@ -17,3 +17,9 @@ model Vote {
   site      String
   createdAt DateTime @default(now())
 }
+
+model Comment {
+  id        String   @id @default(cuid())
+  body      String
+  createdAt DateTime @default(now())
+}
