@@ -131,6 +131,10 @@ export default async function Home() {
                 <VoteButton siteId={site.id} />
               </div>
 
+              <p className="text-xs font-medium text-foreground/70">
+                {site.description}
+              </p>
+
               <div className="flex items-center gap-3">
                 <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-black/30">
                   <div
