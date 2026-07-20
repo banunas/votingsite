@@ -23,3 +23,11 @@ model Comment {
   body      String
   createdAt DateTime @default(now())
 }
+
+model SiteVisit {
+  id        String   @id @default(cuid())
+  visitorId String
+  site      String
+  clickedAt DateTime @default(now())
+  dwellMs   Int?
+}
