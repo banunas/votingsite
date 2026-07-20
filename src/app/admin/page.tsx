@@ -5,6 +5,11 @@ import {
   buildVisitorTable,
 } from "@/lib/visitStats";
 
+// This page has no dynamic-marking API (no cookies/headers/searchParams),
+// so Next.js would otherwise prerender it once at build time and serve
+// that frozen snapshot forever — never reflecting new SiteVisit rows.
+export const dynamic = "force-dynamic";
+
 function formatDuration(ms: number): string {
   if (ms < 1000) return "1초 미만";
   const totalSeconds = Math.round(ms / 1000);
