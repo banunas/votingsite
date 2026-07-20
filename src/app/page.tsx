@@ -3,6 +3,7 @@ import { buildResults } from "@/lib/voteCounts";
 import VoteButton from "./VoteButton";
 import AnimatedCount from "./AnimatedCount";
 import CommentForm from "./CommentForm";
+import SiteLink from "./SiteLink";
 
 const RANK_BADGE = ["👑", "🥈", "🥉", "💀"];
 
@@ -119,14 +120,13 @@ export default async function Home() {
                       ? (RANK_BADGE[i] ?? `${i + 1}위`)
                       : `${i + 1}위`}
                   </span>
-                  <a
+                  <SiteLink
+                    site={site.id}
                     href={site.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className={`truncate font-bold underline decoration-2 underline-offset-4 ${style.text}`}
                   >
                     {site.name}
-                  </a>
+                  </SiteLink>
                 </div>
                 <VoteButton siteId={site.id} />
               </div>
