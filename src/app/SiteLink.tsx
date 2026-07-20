@@ -11,26 +11,47 @@ function getVisitorId(): string {
   return id;
 }
 
+type PendingVisit = {
+  id: string | null;
+  hiddenAt: number | null;
+  dwellMs: number | null;
+};
+
 // Module-level so the one visibilitychange listener registered below sees
 // the most recent tracked click regardless of which SiteLink instance
 // triggered it (there are 4 on the page, one per site).
-let pendingVisit: { id: string; hiddenAt: number } | null = null;
+let pendingVisit: PendingVisit | null = null;
+
+function sendPatchIfReady(visit: PendingVisit) {
+  if (visit.id === null || visit.dwellMs === null) return;
+  fetch(`/api/site-visits/${visit.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dwellMs: visit.dwellMs }),
+  }).catch(() => {});
+}
 
 if (typeof document !== "undefined") {
   document.addEventListener("visibilitychange", () => {
+    if (!pendingVisit) return;
+
     if (document.hidden) {
-      if (pendingVisit) pendingVisit.hiddenAt = Date.now();
+      // The tab can hide before the click's POST resolves (opening the new
+      // tab steals focus immediately; the POST needs a network round trip),
+      // so this timestamp has to be captured here, synchronously, rather
+      // than when the click handler eventually gets an id back.
+      pendingVisit.hiddenAt = Date.now();
       return;
     }
-    if (!pendingVisit) return;
-    const dwellMs = Date.now() - pendingVisit.hiddenAt;
-    const id = pendingVisit.id;
+
+    if (pendingVisit.hiddenAt === null) return;
+    pendingVisit.dwellMs = Date.now() - pendingVisit.hiddenAt;
+    const visit = pendingVisit;
     pendingVisit = null;
-    fetch(`/api/site-visits/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dwellMs }),
-    }).catch(() => {});
+    // The id may not have arrived yet either (same race, other direction) —
+    // sendPatchIfReady no-ops until both id and dwellMs are set, and
+    // handleClick calls it again once its POST resolves.
+    sendPatchIfReady(visit);
   });
 }
 
@@ -46,6 +67,12 @@ export default function SiteLink({
   children: React.ReactNode;
 }) {
   async function handleClick() {
+    const visit: PendingVisit = { id: null, hiddenAt: null, dwellMs: null };
+    // Set synchronously, before the POST even starts, so a visibilitychange
+    // firing before the network round trip completes still has something to
+    // record the hide time onto.
+    pendingVisit = visit;
+
     try {
       const res = await fetch("/api/site-visits", {
         method: "POST",
@@ -54,7 +81,8 @@ export default function SiteLink({
       });
       const data = await res.json();
       if (typeof data.id === "string") {
-        pendingVisit = { id: data.id, hiddenAt: Date.now() };
+        visit.id = data.id;
+        sendPatchIfReady(visit);
       }
     } catch {
       // Best-effort tracking only — the link opens normally either way.
