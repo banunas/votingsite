@@ -31,3 +31,11 @@ model SiteVisit {
   clickedAt DateTime @default(now())
   dwellMs   Int?
 }
+
+model VoteAttempt {
+  id        String   @id @default(cuid())
+  ipHash    String
+  createdAt DateTime @default(now())
+
+  @@index([ipHash, createdAt])
+}
